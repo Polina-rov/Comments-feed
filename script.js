@@ -95,7 +95,12 @@ newName.addEventListener('input', handleDisabled);
 newComment.addEventListener('input', handleDisabled);
 
 addButton.addEventListener('click', addNewComment);
-renderComments();
+
+function clearInputs() {
+  newName.value = '';
+  newComment.value = '';
+  addButton.setAttribute('disabled', 'disabled');
+}
 
 function addNewComment() {
   const date = new Date();
