@@ -98,30 +98,21 @@ addButton.addEventListener('click', addNewComment);
 renderComments();
 
 function addNewComment() {
-  let oldComments = commentList.innerHTML;
-  const dateNow = new Date();
-  let newComments = `<li class="comment">
-    <div class="comment-header">
-      <div>${newName.value}</div>
-      <div>${formatDate(dateNow)}</div>
-    </div>
-    <div class="comment-body">
-      <div class="comment-text">
-        ${newComment.value}
-      </div>
-    </div>
-    <div class="comment-footer">
-      <div class="likes">
-        <span class="">0</span>
-        <button class="like-button"></button>
-      </div>
-    </div>
-  </li>`;
-  commentList.innerHTML = oldComments + newComments;
+  const date = new Date();
+  commentsListArray.push({
+    name: newName.value,
+    date: `${('0' + date.getDate()).slice(-2)}.${(
+      '0' +
+      (date.getMonth() + 1)
+    ).slice(-2)}.${date.getFullYear().toString().slice(-2)} ${(
+      '0' + date.getHours()
+    ).slice(-2)}:${('0' + date.getMinutes()).slice(-2)}`,
+    msg: newComment.value,
+    like: 0,
+  });
   clearInputs();
   renderComments();
 }
-
 function formatDate(date) {
   let dd = date.getDate();
   if (dd < 10) dd = '0' + dd;
