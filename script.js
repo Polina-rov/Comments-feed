@@ -50,18 +50,22 @@ const initLikeClick = () => {
     });
   }
 };
+function commentDate(comment) {
+  return comment.date
+    ? comment.date
+    : `${('0' + date.getDate()).slice(-2)}.${(
+        '0' +
+        (date.getMonth() + 1)
+      ).slice(-2)}.${date.getFullYear().toString().slice(-2)} ${(
+        '0' + date.getHours()
+      ).slice(-2)}:${('0' + date.getMinutes()).slice(-2)}`;
+}
+
 function renderComments() {
   const commentHtmlResult = commentsListArray
     .map((comment, id) => {
+      const dates = commentDate(comment);
       comment.Iliked ? (Iliked = '-active-like') : (Iliked = '');
-      comment.date
-        ? (dates = comment.date)
-        : (dates = `${('0' + date.getDate()).slice(-2)}.${(
-            '0' +
-            (date.getMonth() + 1)
-          ).slice(-2)}.${date.getFullYear().toString().slice(-2)} ${(
-            '0' + date.getHours()
-          ).slice(-2)}:${('0' + date.getMinutes()).slice(-2)}`);
       return `<li class="comment" data-id="${id}">
       <div class="comment-header">
         <div>${comment.name}</div>         
