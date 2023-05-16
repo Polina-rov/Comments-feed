@@ -5,6 +5,8 @@ const newComment = form.querySelector('.add-form-text');
 const addButton = form.querySelector('.add-form-button');
 const comments = document.querySelectorAll('.comment');
 const commentList = document.querySelector('.comments');
+const boxComments = document.querySelector('.comments');
+const boxCommentsTexts = boxComments.querySelectorAll('.comment')
 
 const commentsListArray = [
   {
@@ -26,7 +28,7 @@ const commentsListArray = [
     date: '10.05.23 12:45',
     msg: 'Мне нравится этот проект',
     like: '1',
-    Iliked: true,
+    Iliked: false,
   },
 ];
 const addLikes = (e) => {
@@ -45,6 +47,7 @@ const initLikeClick = () => {
   const likeClickElements = document.querySelectorAll('.likes');
   for (const likeClickElement of likeClickElements) {
     likeClickElement.addEventListener('click', (e) => {
+      e.stopPropagation();
       commentsListArray[e.target.dataset.id].Iliked ? delLikes(e) : addLikes(e);
       renderComments();
     });
@@ -60,6 +63,18 @@ function commentDate(comment) {
         '0' + date.getHours()
       ).slice(-2)}:${('0' + date.getMinutes()).slice(-2)}`;
 }
+const answerComment = () => {
+  const boxCommentsTexts = boxComments.querySelectorAll('.comment');
+  boxCommentsTexts.forEach((comment) => {
+    comment.addEventListener('click', () => {
+      const author = comment.querySelector('.comment-header div:first-child').textContent;
+      const text = comment.querySelector('.comment-text').textContent;
+      newComment.value = `@${author} \n\n > ${text}, `;
+    });
+  })
+};
+answerComment();
+
 
 function renderComments() {
   const commentHtmlResult = commentsListArray
@@ -87,7 +102,9 @@ function renderComments() {
     .join('');
   commentList.innerHTML = commentHtmlResult;
   initLikeClick();
-}
+  answerComment();
+};
+renderComments();
 function handleDisabled() {
   if (newName.value === '' || newComment.value === '') {
     addButton.setAttribute('disabled', 'disabled');
@@ -109,18 +126,27 @@ function clearInputs() {
 function addNewComment() {
   const date = new Date();
   commentsListArray.push({
-    name: newName.value,
+    name: newName.value
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;'),
     date: `${('0' + date.getDate()).slice(-2)}.${(
       '0' +
       (date.getMonth() + 1)
     ).slice(-2)}.${date.getFullYear().toString().slice(-2)} ${(
       '0' + date.getHours()
     ).slice(-2)}:${('0' + date.getMinutes()).slice(-2)}`,
-    msg: newComment.value,
+    msg: newComment.value
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;'),
     like: 0,
   });
   clearInputs();
   renderComments();
+  answerComment();
 }
 function formatDate(date) {
   let dd = date.getDate();
