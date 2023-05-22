@@ -6,41 +6,49 @@ const addButton = form.querySelector('.add-form-button');
 const comments = document.querySelectorAll('.comment');
 const commentList = document.querySelector('.comments');
 const boxComments = document.querySelector('.comments');
-const boxCommentsTexts = boxComments.querySelectorAll('.comment')
+const boxCommentsTexts = boxComments.querySelectorAll('.comment');
+let now = new Date();
 
-const commentsListArray = [
-  {
-    name: 'Глеб Фокин',
-    date: '12.02.22 12:18',
-    msg: 'Это будет первый комментарий на этой странице',
-    like: '3',
-    Iliked: false,
-  },
-  {
-    name: 'Варвара Н.',
-    date: '13.02.22 19:22',
-    msg: 'Мне нравится как оформлена эта страница! ❤',
-    like: '75',
-    Iliked: false,
-  },
-  {
-    name: 'Полина',
-    date: '10.05.23 12:45',
-    msg: 'Мне нравится этот проект',
-    like: '1',
-    Iliked: false,
-  },
-];
+let commentsListArray = [];
+
+function getApi() {
+  return fetch(
+    'https://webdev-hw-api.vercel.app/api/v1/polina-rovdo/comments',
+    {
+      method: 'GET',
+    }
+  )
+    .then((response) => {
+      return response.json();
+    })
+
+    .then((responseData) => {
+      const appComments = responseData.comments.map((comment) => {
+        return {
+          name: comment.author.name,
+          date: new Date(comment.date).toLocaleString().slice(0, -3),
+          text: comment.text,
+          likes: comment.likes,
+          isLiked: false,
+        };
+      });
+      commentsListArray = appComments;
+      renderComments();
+    });
+}
+
+getApi();
+
 const addLikes = (e) => {
   const comment = commentsListArray[e.target.dataset.id];
-  comment.like++;
-  comment.Iliked = true;
+  comment.likes++;
+  comment.Isliked = true;
 };
 
 const delLikes = (e) => {
   const comment = commentsListArray[e.target.dataset.id];
-  comment.like--;
-  comment.Iliked = false;
+  comment.likes--;
+  comment.Isliked = false;
 };
 
 const initLikeClick = () => {
@@ -48,7 +56,9 @@ const initLikeClick = () => {
   for (const likeClickElement of likeClickElements) {
     likeClickElement.addEventListener('click', (e) => {
       e.stopPropagation();
-      commentsListArray[e.target.dataset.id].Iliked ? delLikes(e) : addLikes(e);
+      commentsListArray[e.target.dataset.id].Isliked
+        ? delLikes(e)
+        : addLikes(e);
       renderComments();
     });
   }
@@ -67,20 +77,21 @@ const answerComment = () => {
   const boxCommentsTexts = boxComments.querySelectorAll('.comment');
   boxCommentsTexts.forEach((comment) => {
     comment.addEventListener('click', () => {
-      const author = comment.querySelector('.comment-header div:first-child').textContent;
+      const author = comment.querySelector(
+        '.comment-header div:first-child'
+      ).textContent;
       const text = comment.querySelector('.comment-text').textContent;
       newComment.value = `@${author} \n\n > ${text}, `;
     });
-  })
+  });
 };
 answerComment();
-
 
 function renderComments() {
   const commentHtmlResult = commentsListArray
     .map((comment, id) => {
       const dates = commentDate(comment);
-      comment.Iliked ? (Iliked = '-active-like') : (Iliked = '');
+      comment.Isliked ? (Isliked = '-active-like') : (Isliked = '');
       return `<li class="comment" data-id="${id}">
       <div class="comment-header">
         <div>${comment.name}</div>         
@@ -88,13 +99,13 @@ function renderComments() {
       </div>
       <div class="comment-body">
         <div class="comment-text">
-          ${comment.msg}
+          ${comment.text}
         </div>
       </div>
       <div class="comment-footer">
         <div class="likes">
-          <span class="likes-counter" >${comment.like}</span>
-          <button class="like-button ${Iliked}" data-id="${id}"></button>
+          <span class="likes-counter" >${comment.likes}</span>
+          <button class="like-button ${Isliked}" data-id="${id}"></button>
         </div>
       </div>
     </li>`;
@@ -103,8 +114,9 @@ function renderComments() {
   commentList.innerHTML = commentHtmlResult;
   initLikeClick();
   answerComment();
-};
+}
 renderComments();
+
 function handleDisabled() {
   if (newName.value === '' || newComment.value === '') {
     addButton.setAttribute('disabled', 'disabled');
@@ -124,30 +136,65 @@ function clearInputs() {
 }
 
 function addNewComment() {
-  const date = new Date();
-  commentsListArray.push({
-    name: newName.value
-      .replaceAll('&', '&amp;')
-      .replaceAll('<', '&lt;')
-      .replaceAll('>', '&gt;')
-      .replaceAll('"', '&quot;'),
-    date: `${('0' + date.getDate()).slice(-2)}.${(
-      '0' +
-      (date.getMonth() + 1)
-    ).slice(-2)}.${date.getFullYear().toString().slice(-2)} ${(
-      '0' + date.getHours()
-    ).slice(-2)}:${('0' + date.getMinutes()).slice(-2)}`,
-    msg: newComment.value
-      .replaceAll('&', '&amp;')
-      .replaceAll('<', '&lt;')
-      .replaceAll('>', '&gt;')
-      .replaceAll('"', '&quot;'),
-    like: 0,
-  });
-  clearInputs();
+  const fetchPromise = fetch(
+    'https://webdev-hw-api.vercel.app/api/v1/polina-rovdo/comments',
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        id: 1,
+        date: `${now.toLocaleString().slice(0, -3)}`,
+        likes: 0,
+        isLiked: false,
+        text: `${newComment.value
+          .replaceAll('<', '&lt;')
+          .replaceAll('<', '&gt;')}`,
+        name: newName.value.replaceAll('<', '&lt;').replaceAll('<', '&gt;'),
+      }),
+    }
+  )
+    .then((response) => {
+      return response.json();
+    })
+
+    .then((responseData) => {
+      return (commentsListArray = responseData.comments);
+    })
+
+    .then(() => {
+      return getApi();
+      return renderComments();
+    });
+
+  getApi();
   renderComments();
   answerComment();
+  clearInputs();
 }
+//   const date = new Date();
+//   commentsListArray.push({
+//     name: newName.value
+//       .replaceAll('&', '&amp;')
+//       .replaceAll('<', '&lt;')
+//       .replaceAll('>', '&gt;')
+//       .replaceAll('"', '&quot;'),
+//     date: `${('0' + date.getDate()).slice(-2)}.${(
+//       '0' +
+//       (date.getMonth() + 1)
+//     ).slice(-2)}.${date.getFullYear().toString().slice(-2)} ${(
+//       '0' + date.getHours()
+//     ).slice(-2)}:${('0' + date.getMinutes()).slice(-2)}`,
+//     text: newComment.value
+//       .replaceAll('&', '&amp;')
+//       .replaceAll('<', '&lt;')
+//       .replaceAll('>', '&gt;')
+//       .replaceAll('"', '&quot;'),
+//     likes: 0,
+//   });
+//   clearInputs();
+//   renderComments();
+//   answerComment();
+// }
+
 function formatDate(date) {
   let dd = date.getDate();
   if (dd < 10) dd = '0' + dd;
