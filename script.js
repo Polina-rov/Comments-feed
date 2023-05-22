@@ -170,31 +170,6 @@ function addNewComment() {
   answerComment();
   clearInputs();
 }
-//   const date = new Date();
-//   commentsListArray.push({
-//     name: newName.value
-//       .replaceAll('&', '&amp;')
-//       .replaceAll('<', '&lt;')
-//       .replaceAll('>', '&gt;')
-//       .replaceAll('"', '&quot;'),
-//     date: `${('0' + date.getDate()).slice(-2)}.${(
-//       '0' +
-//       (date.getMonth() + 1)
-//     ).slice(-2)}.${date.getFullYear().toString().slice(-2)} ${(
-//       '0' + date.getHours()
-//     ).slice(-2)}:${('0' + date.getMinutes()).slice(-2)}`,
-//     text: newComment.value
-//       .replaceAll('&', '&amp;')
-//       .replaceAll('<', '&lt;')
-//       .replaceAll('>', '&gt;')
-//       .replaceAll('"', '&quot;'),
-//     likes: 0,
-//   });
-//   clearInputs();
-//   renderComments();
-//   answerComment();
-// }
-
 function formatDate(date) {
   let dd = date.getDate();
   if (dd < 10) dd = '0' + dd;
