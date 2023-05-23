@@ -161,7 +161,7 @@ function addNewComment() {
       return renderComments();
     });
 
-  getApi();
+  
   renderComments();
   answerComment();
   clearInputs();
