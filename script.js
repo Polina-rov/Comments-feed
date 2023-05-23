@@ -141,10 +141,6 @@ function addNewComment() {
     {
       method: 'POST',
       body: JSON.stringify({
-        id: 1,
-        date: `${now.toLocaleString().slice(0, -3)}`,
-        likes: 0,
-        isLiked: false,
         text: `${newComment.value
           .replaceAll('<', '&lt;')
           .replaceAll('<', '&gt;')}`,
