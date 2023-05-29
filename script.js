@@ -8,8 +8,15 @@ const commentList = document.querySelector('.comments');
 const boxComments = document.querySelector('.comments');
 const boxCommentsTexts = boxComments.querySelectorAll('.comment');
 let now = new Date();
-
 let commentsListArray = [];
+
+window.onload = function () {
+  document.body.classList.add('loaded_hiding');
+  window.setTimeout(function () {
+    document.body.classList.add('loaded');
+    document.body.classList.remove('loaded_hiding');
+  }, 700);
+};
 
 function getApi() {
   return fetch(
@@ -136,6 +143,12 @@ function clearInputs() {
 }
 
 function addNewComment() {
+  form.classList.add('hidden');
+  let loader = document.createElement('p');
+  loader.className = 'loader';
+  loader.textContent = 'Комментарии загружаются...';
+  container.appendChild(loader);
+
   const fetchPromise = fetch(
     'https://webdev-hw-api.vercel.app/api/v1/polina-rovdo/comments',
     {
@@ -159,9 +172,11 @@ function addNewComment() {
     .then(() => {
       return getApi();
       return renderComments();
+    })
+    .then((data) => {
+      loader.classList.add('hidden');
+      form.classList.remove('hidden');
     });
-
-  
   renderComments();
   answerComment();
   clearInputs();
