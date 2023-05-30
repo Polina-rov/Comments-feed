@@ -26,7 +26,13 @@ function getApi() {
     }
   )
     .then((response) => {
-      return response.json();
+      if (response.status === 200) {
+        return response.json();
+      } else if (response.status === 500) {
+        throw new Error('Сервер упал');
+      } else {
+        throw new Error('неизвестная ошибка');
+      }
     })
 
     .then((responseData) => {
@@ -41,6 +47,11 @@ function getApi() {
       });
       commentsListArray = appComments;
       renderComments();
+    })
+    .catch((error) => {
+      if (error.message === 'Сервер упал') {
+        alert('ошибка загрузки данных');
+      }
     });
 }
 
@@ -143,6 +154,8 @@ function clearInputs() {
 }
 
 function addNewComment() {
+  let shortName = newName.value;
+  let shortComment = newComment.value;
   form.classList.add('hidden');
   let loader = document.createElement('p');
   loader.className = 'loader';
@@ -158,29 +171,54 @@ function addNewComment() {
           .replaceAll('<', '&lt;')
           .replaceAll('<', '&gt;')}`,
         name: newName.value.replaceAll('<', '&lt;').replaceAll('<', '&gt;'),
+        forceError: true,
       }),
     }
   )
     .then((response) => {
-      return response.json();
-    })
+      if (response.status === 400) {
+        // newName.value = shortName;
+        // newComment.value = shortComment;
+        throw new Error('Введите более 3-х символов');
+      }
 
+      if (response.status === 500) {
+        throw new Error('Сервер упал');
+      } else {
+        return response.json();
+      }
+    })
     .then((responseData) => {
+      console.log(responseData);
       return (commentsListArray = responseData.comments);
     })
 
     .then(() => {
       return getApi();
-      return renderComments();
     })
+
+    .catch((error) => {
+      if (error.message === 'Введите более 3-х символов') {
+        alert(error.message);
+      } else if (error.message === 'Сервер упал') {
+        alert('Сервер сломался, попробуйте позже');
+      } else {
+        alert('Кажется, у вас сломался интернет, попробуйте позже');
+      }
+      newName.value = shortName;
+      newComment.value = shortComment;
+    })
+
     .then((data) => {
       loader.classList.add('hidden');
       form.classList.remove('hidden');
     });
+
   renderComments();
   answerComment();
   clearInputs();
 }
+
 function formatDate(date) {
   let dd = date.getDate();
   if (dd < 10) dd = '0' + dd;
