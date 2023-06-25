@@ -73,9 +73,9 @@ function addNewComment() {
       getApi().then((response) => {
         commentsListArray = response;
         renderComments(commentsListArray);
-      });
       answerComment();
       clearInputs();
+      });
     })
     .catch((e) => {
       newName.value = shortName;
