@@ -1,17 +1,27 @@
-export function getApi() {
-  return fetch(
-    'https://webdev-hw-api.vercel.app/api/v1/polina-rovdo/comments',
-    {
-      method: 'GET',
-    }
-  )
+const HOST_COMMENTS =
+  'https://webdev-hw-api.vercel.app/api/v2/polina-rovdo/comments';
+const HOST_LOGIN = 'https://webdev-hw-api.vercel.app/api/user/login';
+const HOST_REGISTER = 'https://webdev-hw-api.vercel.app/api/user';
+
+function getHeaders(token) {
+  if (!token) return;
+  return {
+    Authorization: `Bearer ${token}`,
+  };
+}
+
+export function getApi(token) {
+  return fetch(HOST_COMMENTS, {
+    method: 'GET',
+    headers: getHeaders(token),
+  })
     .then((response) => {
       if (response.status === 200) {
         return response.json();
       } else if (response.status === 500) {
-        throw new Error('Сервер упал');
+        throw new Error('Ошибка при авторизации');
       } else {
-        throw new Error('неизвестная ошибка');
+        throw new Error('Нет авторизации');
       }
     })
 
@@ -33,18 +43,17 @@ export function getApi() {
       }
     });
 }
-export const fetchPromise = (comment) => {
-  return fetch(
-    'https://webdev-hw-api.vercel.app/api/v1/polina-rovdo/comments',
-    {
-      method: 'POST',
-      body: JSON.stringify({
-        text: `${comment.text.replaceAll('<', '&lt;').replaceAll('<', '&gt;')}`,
-        name: comment.name.replaceAll('<', '&lt;').replaceAll('<', '&gt;'),
-        forceError: true,
-      }),
-    }
-  )
+
+export const postComment = (comment, token) => {
+  return fetch(HOST_COMMENTS, {
+    method: 'POST',
+    headers: getHeaders(token),
+    body: JSON.stringify({
+      text: `${comment.text.replaceAll('<', '&lt;').replaceAll('<', '&gt;')}`,
+      name: comment.name.replaceAll('<', '&lt;').replaceAll('<', '&gt;'),
+      forceError: true,
+    }),
+  })
     .then((response) => {
       if (response.status === 400) {
         throw new Error('Введите более 3-х символов');
@@ -68,3 +77,34 @@ export const fetchPromise = (comment) => {
       throw error;
     });
 };
+
+export function loginUser({ login, password }) {
+  return fetch(HOST_LOGIN, {
+    method: 'POST',
+    body: JSON.stringify({
+      login,
+      password,
+    }),
+  }).then((response) => {
+    if (response.status === 400) {
+      throw new Error('Неверный логин или пароль');
+    }
+    return response.json();
+  });
+}
+
+export function registerUser({ login, password, name }) {
+  return fetch(HOST_REGISTER, {
+    method: 'POST',
+    body: JSON.stringify({
+      login,
+      password,
+      name,
+    }),
+  }).then((response) => {
+    if (response.status === 400) {
+      throw new Error('Такой пользователь уже существует');
+    }
+    return response.json();
+  });
+}
