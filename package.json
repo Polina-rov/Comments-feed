@@ -1,0 +1,28 @@
+{
+  "name": "webdev-dom-homework",
+  "version": "1.0.0",
+  "description": "проект Лента Комментариев",
+  "main": "api.js",
+  "scripts": {
+    "dev": "webpack --mode development --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Polina-rov/webdev-dom-homework.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Polina-rov/webdev-dom-homework/issues"
+  },
+  "homepage": "https://github.com/Polina-rov/webdev-dom-homework#readme",
+  "dependencies": {
+    "date-fns": "^2.30.0",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "webpack": "^5.88.1",
+    "webpack-cli": "^5.1.4"
+  }
+}

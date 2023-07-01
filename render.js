@@ -1,4 +1,5 @@
 import { addNewComment, fetchComments } from './comments.js';
+import { format } from 'date-fns';
 
 const appEl = document.getElementById('app');
 const commentForm = `
@@ -36,17 +37,6 @@ const initLikeClick = (comments, authorized, user) => {
     });
   }
 };
-
-function commentDate(comment) {
-  return comment.date
-    ? comment.date
-    : `${('0' + date.getDate()).slice(-2)}.${(
-        '0' +
-        (date.getMonth() + 1)
-      ).slice(-2)}.${date.getFullYear().toString().slice(-2)} ${(
-        '0' + date.getHours()
-      ).slice(-2)}:${('0' + date.getMinutes()).slice(-2)}`;
-}
 
 function getAppHtml(
   comments,
@@ -87,13 +77,13 @@ function getAppHtml(
 
   resultHtml = `<ul class="comments-list">${comments
     .map((comment, id) => {
-      const dates = commentDate(comment);
+      const createDate = format(new Date(comment.date), 'dd/MM/yyyy hh:mm');
       let Isliked;
       comment.Isliked ? (Isliked = '-active-like') : (Isliked = '');
       return `<li class="comment" data-id="${id}">
         <div class="comment-header">
           <div>${comment.name}</div>         
-          <div>${dates}</div>          
+          <div>${createDate}</div> 
         </div>
         <div class="comment-body">
           <div class="comment-text">
@@ -108,7 +98,7 @@ function getAppHtml(
         </div>
       </li>`;
     })
-    .join('')}</ul>`
+    .join('')}</ul>`;
   if (!authorized) {
     resultHtml += `
         <div class="link3">Чтобы добавить комментарий,<button class="link2" id="autorization-button">авторизуйтесь</button></div>`;

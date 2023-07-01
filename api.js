@@ -1,3 +1,4 @@
+import _ from 'lodash';
 const HOST_COMMENTS =
   'https://webdev-hw-api.vercel.app/api/v2/polina-rovdo/comments';
 const HOST_LOGIN = 'https://webdev-hw-api.vercel.app/api/user/login';
@@ -29,7 +30,7 @@ export function getApi(token) {
       const appComments = responseData.comments.map((comment) => {
         return {
           name: comment.author.name,
-          date: new Date(comment.date).toLocaleString().slice(0, -3),
+          date: comment.date,
           text: comment.text,
           likes: comment.likes,
           isLiked: false,
@@ -99,7 +100,7 @@ export function registerUser({ login, password, name }) {
     body: JSON.stringify({
       login,
       password,
-      name,
+      name: _.capitalize(name),
     }),
   }).then((response) => {
     if (response.status === 400) {
